@@ -42,6 +42,7 @@ def server():
         in_system_processes[current_process_in_server]["out_server_time"] = time
         current_process = copy.deepcopy(in_system_processes[current_process_in_server])
         finished_processes[current_process_in_server] = current_process
+        print(f"process number {current_process_in_server} released server in {time}")
         del in_system_processes[current_process_in_server]
     if len(in_system_processes) != 0 and not is_server_busy:
         if SERVICE_POLICY == "FIFO":
@@ -53,6 +54,7 @@ def server():
             service_time = current_process["service_time"]
             is_server_busy = True
             server_free_in = time + service_time
+            print(f"process number {current_id} got server in {time} and will hold it for {service_time} seconds")
         elif SERVICE_POLICY == "WRR":
             pass
         elif SERVICE_POLICY == "NPPS":
