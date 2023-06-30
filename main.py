@@ -7,8 +7,8 @@ X = 5
 Y = 3
 T = 200
 SERVICE_POLICY = "WRR"
-PROCESSOR_NUMER = 3
-LINE_LIMIT = 3
+PROCESSOR_NUMER = 1
+LINE_LIMIT = 10
 
 in_system_processes = dict()
 finished_processes = dict()
@@ -78,12 +78,13 @@ def store_process():
     # just escape the first process
     if process_number > 1:
         # just line length check
-        if((SERVICE_POLICY == "WRR" and len(WRR_Lines[priority-1])>= LINE_LIMIT)
-            or (SERVICE_POLICY != "WRR" and len(fifo_npps_line)>=LINE_LIMIT)):
+        if ((SERVICE_POLICY == "WRR" and len(WRR_Lines[priority - 1]) >= LINE_LIMIT)
+                or (SERVICE_POLICY != "WRR" and len(fifo_npps_line) >= LINE_LIMIT)):
             print(f"Line is full!")
         else:
-            WRR_Lines[priority-1].append(process_number)
-            fifo_npps_line.append([process_number,{"arrival_time": time, "service_time": service_time, "priority": priority}])
+            WRR_Lines[priority - 1].append(process_number)
+            fifo_npps_line.append(
+                [process_number, {"arrival_time": time, "service_time": service_time, "priority": priority}])
 
     print(f"process number {process_number} was added with arrival time = {time}, "
           f"service time = {service_time} and priority = {priority}.")
@@ -102,7 +103,7 @@ def get_next_process_for_npps(fifo_npps_line):
         if detail[1]["priority"] == max_priority and detail[1]["arrival_time"] < least_time:
             least_time = detail[1]["arrival_time"]
     to_return = None
-    for index,detail in enumerate(fifo_npps_line):
+    for index, detail in enumerate(fifo_npps_line):
         if detail[1]["priority"] == max_priority and detail[1]["arrival_time"] == least_time:
             to_return = detail[0]
             fifo_npps_line.pop(index)
@@ -127,17 +128,17 @@ def server():
 
     free_processor = does_found_free_processor()
     if len(in_system_processes) != 0 and free_processor != None:
-        if SERVICE_POLICY == "FIFO" and len(fifo_npps_line)>0:
+        if SERVICE_POLICY == "FIFO" and len(fifo_npps_line) > 0:
             current_id = fifo_npps_line.pop(0)[0]
-            select_process(current_id,free_processor)   
+            select_process(current_id, free_processor)
 
         elif SERVICE_POLICY == "WRR":
             get_next_process_WRR(free_processor)
 
-        elif SERVICE_POLICY == "NPPS" and len(fifo_npps_line)>0:
+        elif SERVICE_POLICY == "NPPS" and len(fifo_npps_line) > 0:
             current_id = get_next_process_for_npps(fifo_npps_line)
-            if current_id!=1:
-                select_process(current_id,free_processor)
+            if current_id != 1:
+                select_process(current_id, free_processor)
 
 
 def get_next_process_WRR(free_processor):
@@ -216,11 +217,22 @@ def select_process(current_id, free_processor):
 def start():
     global time, in_system_processes, process_number, next_process_in
     if time == 0:
-       store_process()
-       server_id = 0
-       processors_free_in_time[server_id] = next_process_in
-       processes_in_server[server_id] = 1 
-       processors_busy[server_id] = True
+        # store_process()
+        global next_process_in, process_number
+        interarrival = generate_random_time("interarrival")
+        service_time = generate_random_time("service")
+        priority = generate_priority()
+        in_system_processes[process_number] = {"arrival_time": time, "service_time": service_time, "priority": priority}
+        print(f"process number {process_number} was added with arrival time = {time}, "
+              f"service time = {service_time} and priority = {priority}.")
+        print(f"next process will be in system {interarrival} seconds later.")
+        process_number += 1
+        next_process_in = time + interarrival
+
+        server_id = 0
+        processors_free_in_time[server_id] = service_time
+        processes_in_server[server_id] = 1
+        processors_busy[server_id] = True
     while time <= T:
         generate_process()
         server()
