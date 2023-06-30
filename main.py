@@ -6,9 +6,9 @@ import copy
 X = 5
 Y = 3
 T = 200
-SERVICE_POLICY = "FIFO"
+SERVICE_POLICY = "WRR"
 PROCESSOR_NUMER = 3
-LINE_LIMIT = 10
+LINE_LIMIT = 3
 
 in_system_processes = dict()
 finished_processes = dict()
@@ -77,11 +77,13 @@ def store_process():
     # add a process to its line
     # just escape the first process
     if process_number > 1:
-        if(len(WRR_Lines[priority-1])>= LINE_LIMIT or len(fifo_npps_line)>=LINE_LIMIT):
+        # just line length check
+        if((SERVICE_POLICY == "WRR" and len(WRR_Lines[priority-1])>= LINE_LIMIT)
+            or (SERVICE_POLICY != "WRR" and len(fifo_npps_line)>=LINE_LIMIT)):
             print(f"Line is full!")
-            return
-        WRR_Lines[priority-1].append(process_number)
-        fifo_npps_line.append([process_number,{"arrival_time": time, "service_time": service_time, "priority": priority}])
+        else:
+            WRR_Lines[priority-1].append(process_number)
+            fifo_npps_line.append([process_number,{"arrival_time": time, "service_time": service_time, "priority": priority}])
 
     print(f"process number {process_number} was added with arrival time = {time}, "
           f"service time = {service_time} and priority = {priority}.")
