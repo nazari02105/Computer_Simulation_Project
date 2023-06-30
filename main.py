@@ -134,12 +134,7 @@ def get_next_process_WRR():
         else:
             pass
     elif Last_WRR_state[0] == 1 and Last_WRR_state[1] > 0:
-        if len(WRR_Lines[0]):
-            Last_WRR_state = [1,Last_WRR_state[1]-1]
-            current_id = WRR_Lines[0].pop(0)
-            select_process(current_id)
-            print(f"A process executed ftom line: 1")
-        elif len(WRR_Lines[2]):
+        if len(WRR_Lines[2]):
             Last_WRR_state = [3,2]
             current_id = WRR_Lines[2].pop(0)
             select_process(current_id) 
@@ -149,6 +144,11 @@ def get_next_process_WRR():
             current_id = WRR_Lines[1].pop(0)
             select_process(current_id) 
             print(f"A process executed ftom line: 2")
+        elif len(WRR_Lines[0]):
+            Last_WRR_state = [1,Last_WRR_state[1]-1]
+            current_id = WRR_Lines[0].pop(0)
+            select_process(current_id)
+            print(f"A process executed ftom line: 1")
         else:
             pass
 
