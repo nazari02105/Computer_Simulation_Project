@@ -91,6 +91,9 @@ def server():
 
         elif SERVICE_POLICY == "WRR":
             get_next_process_WRR()
+        elif SERVICE_POLICY == "NPPS":
+            current_id = get_next_process_for_npps()
+            select_process(current_id)
 
 def get_next_process_WRR():
     global Last_WRR_state
